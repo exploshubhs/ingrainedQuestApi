@@ -2,9 +2,10 @@
 
 const path = require('path')
 const fs = require('fs')
-const SQL = require('sql.js')
-const view = require(path.join(__dirname,'../views', 'common-views.js'))
+const SQL = require('sql')
+//const view = require(path.join(__dirname,'../views', 'common-views.js'))
 const pg =   require('pg');
+const connect = require('../bibliography/config');
 var pgClient=null;
 //const client=null;
 
@@ -90,7 +91,7 @@ module.exports.getUsers = function (connection) {
           console.log('queried tows',result.rows);
           if (row !== undefined && row.length > 0) {
            // row = _rowsFromSqlDataObject(row[0])
-            view.showUsers(row)
+           // view.showUsers(row)
           }
         } catch (error) {
           console.log('model.getUsers', error.message)
@@ -105,29 +106,98 @@ module.exports.getUsers = function (connection) {
   
   });
 }
+/*
+  Populates the Record List Of Specified Table.
+*/
+
+module.exports.getRecordList = function (tableName, fields, whereClause, orderByClause) {
+  return new Promise((resolve, reject) => {
+  var connection = connect.PGconnection;
+  console.log('connection ', connection);
+  var str=this.createConnectUrl(connection);
+  console.log('str ', str);
+  pgClient= new pg.Client(str);
+
+  console.log('about to connect');
+  
+  pgClient.connect( function( connectError ) {
+  
+    console.log('connected ', connectError);
+  
+    console.log('about to query');
+    var sqlQuery ="SELECT "+ fields + " FROM " + tableName;
+    
+    // adding whereClause to Query If it's specified in the call
+    if(whereClause!= undefined)
+    {
+       sqlQuery += " WHERE 1=1 AND " + whereClause ;
+    }
+    // adding orderByClause to Query If it's specified in the call
+    if(orderByClause!= undefined)
+    {
+       sqlQuery +=" ORDER BY " + orderByClause;
+    }
+    pgClient.query(sqlQuery, function( queryError, result ) {
+  
+      console.log('queried',queryError);
+      if (result !== null) {
+        
+        try {
+            console.log('queried rows',result.rows);
+            resolve(result);
+        } catch (error) {
+            console.log('model.getUsers', error.message);
+            reject('FAILURE');
+        } finally {
+         // pgClient.close();
+        }  
+        console.log('results :'+result.rows);
+        resolve('NoResults');
+      }
+    });
+  
+  });
+  })
+}
 
 /*
-  Fetch a user's data from the database.
+  Fetch records depending on the ID and the Table from the database.
 */
-module.exports.getUser = function (uid) {
-  let db = SQL.dbOpen(window.model.db)
-  if (db !== null) {
-    let query = 'SELECT * FROM `Users` WHERE `ID` IS ?'
-    let statement = db.prepare(query, [uid])
-    try {
-      if (statement.step()) {
-        let values = [statement.get()]
-        let columns = statement.getColumnNames()
-        return _rowsFromSqlDataObject({values: values, columns: columns})
-      } else {
-        console.log('model.getUser', 'No data found for User ID =', uid)
+module.exports.getRecord = function (uid,fields, tableName) {
+  return new Promise((resolve, reject) => {
+    var connection = connect.PGconnection;
+    var connectionString=this.createConnectUrl(connection);
+    pgClient= new pg.Client(connectionString);
+    console.log('about to connect');
+    pgClient.connect( function( connectError ) {
+      console.log('connected ', connectError);
+    
+      console.log('about to query');
+      if (fields === undefined)
+      {
+        fields = "*";
       }
-    } catch (error) {
-      console.log('model.getUser', error.message)
-    } finally {
-      SQL.dbClose(db, window.model.db)
-    }
-  }
+      var sqlQuery ="SELECT "+ fields + " FROM " + tableName + " WHERE id::text = " + "'"+ uid +"'" ;
+      pgClient.query(sqlQuery, function( queryError, result ) {
+    
+        console.log('queried',queryError);
+        if (result !== null) {
+          
+          try {
+              console.log('queried rows',result.rows);
+              resolve(result);
+          } catch (error) {
+              console.log('model.getUsers', error.message);
+              reject('FAILURE');
+          } finally {
+           // pgClient.close();
+          }  
+          console.log('results :'+result.rows);
+          resolve('NoResults');
+        }
+      });
+    });
+    })
 }
 
 /*

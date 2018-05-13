@@ -6,6 +6,7 @@ const SQL = require('sql')
 const view = require(path.join(__dirname,'../views', 'ingrainedQuestUsersView.js'))
 const pg =   require('pg');
 var pgClient=null;
+var mainModel = require('../models/main-model');
 //const client=null;
 
 //const ipcRenderer = require('electron').remote.ipcRenderer;
@@ -50,84 +51,32 @@ var pgClient=null;
 /*
   Populates the User List.
 */
-module.exports.getUsers = function (connection) {
-  // let db = SQL.dbOpen(window.model.db)
-  // if (db !== null) {
-  //   let query = 'SELECT * FROM `Users` ORDER BY `LastName` ASC'
-  //   try {
-  //     let row = db.exec(query)
-  //     if (row !== undefined && row.length > 0) {
-  //       row = _rowsFromSqlDataObject(row[0])
-  //       view.showPeople(row)
-  //     }
-  //   } catch (error) {
-  //     console.log('model.getUsers', error.message)
-  //   } finally {
-  //     SQL.dbClose(db, window.model.db)
-  //   }
-  // }
-
-  console.log('connection ', connection);
-  var str=this.createConnectUrl(connection);
-  console.log('str ', str);
-  pgClient= new pg.Client(str);
-
-  console.log('about to connect');
-  
-  pgClient.connect( function( connectError ) {
-  
-    console.log('connected ', connectError);
-  
-    console.log('about to query');
-  
-    pgClient.query('SELECT * FROM Users ORDER BY LastName ASC', function( queryError, result ) {
-  
-      console.log('queried',queryError);
-      if (result !== null) {
-        
-        try {
-          let row = result.rows
-          console.log('queried tows',result.rows);
-          if (row !== undefined && row.length > 0) {
-           // row = _rowsFromSqlDataObject(row[0])
-            view.showUsers(row)
-          }
-        } catch (error) {
-          console.log('model.getUsers', error.message)
-        } finally {
-         // pgClient.close();
-        }
-
-        console.log('results :'+result);
-      }
-  
-    });
-  
+module.exports.getUsers = function () {
+ return new Promise((resolve, reject) => {
+  mainModel.getRecordList('Users', '*').then((response, error) =>{
+    if(!error){
+      console.log('User Model'+ response);
+      resolve(response);
+    } else {
+      reject(error);
+    }
   });
+})
 }
-
 /*
   Fetch a user's data from the database.
 */
 module.exports.getUser = function (uid) {
-  let db = SQL.dbOpen(window.model.db)
-  if (db !== null) {
-    let query = 'SELECT * FROM `Users` WHERE `ID` IS ?'
-    let statement = db.prepare(query, [uid])
-    try {
-      if (statement.step()) {
-        let values = [statement.get()]
-        let columns = statement.getColumnNames()
-        return _rowsFromSqlDataObject({values: values, columns: columns})
+  return new Promise((resolve, reject) => {
+    mainModel.getRecord(uid, '*', 'Users').then((response, error) =>{
+      if(!error){
+        console.log('User Model'+ response);
+        resolve(response);
       } else {
-        console.log('model.getUser', 'No data found for User ID =', uid)
+        reject(error);
       }
-    } catch (error) {
-      console.log('model.getUser', error.message)
-    } finally {
-      SQL.dbClose(db, window.model.db)
-    }
-  }
+    });
+  })
 }
 
 /*
