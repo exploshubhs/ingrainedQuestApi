@@ -201,6 +201,69 @@ module.exports.getRecord = function (uid,fields, tableName) {
 }
 
 /*
+  Create A Single Record In the database.
+*/
+module.exports.createRecord = function (insertQuery) {
+  return new Promise((resolve, reject) => {
+    var connection = connect.PGconnection;
+    var connectionString=this.createConnectUrl(connection);
+    pgClient= new pg.Client(connectionString);
+    console.log('about to connect');
+    pgClient.connect( function( connectError ) {
+      console.log('connected ', connectError);
+      pgClient.query(insertQuery, function( queryError, result ) {
+        console.log('queried',queryError);
+        if (result !== null) {
+          
+          try {
+              console.log('queried rows',result.rows);
+              resolve(result);
+          } catch (error) {
+              console.log('model.getUsers', error.message);
+              reject('FAILURE');
+          } finally {
+           // pgClient.close();
+          }  
+          console.log('results :'+result.rows);
+          resolve('NoResults');
+        }
+      });
+    });
+    })
+}
+
+/*
+  Deletes A Record from the database Depending On Specified ID and TableName.
+*/
+module.exports.deleteRecord = function (uid, tableName) {
+  return new Promise((resolve, reject) => {
+    var connection = connect.PGconnection;
+    var connectionString=this.createConnectUrl(connection);
+    pgClient= new pg.Client(connectionString);
+    console.log('about to connect');
+    pgClient.connect( function( connectError ) {
+      console.log('connected ', connectError);
+    
+      console.log('about to execute delete query');
+      var sqlQuery ="DELETE  FROM " + tableName + " WHERE id::text = " + "'"+ uid +"'" ;
+      pgClient.query(sqlQuery, function( queryError, result ) {
+        if (result !== null) {
+          
+          try {
+              resolve(result);
+          } catch (error) {
+              reject('FAILURE');
+          } finally {
+           // pgClient.close();
+          }  
+          resolve('NoResults');
+        }
+      });
+    });
+    })
+}
+
+/*
   Delete a user's data from the database.
 */
 module.exports.deleteUser = function (uid, callback) {

@@ -1,46 +1,33 @@
-// 'use strict';
-// module.exports =  function (app) {
-//   var ingrainedQuestUsers = require('../controllers/ingrainedQuestController');
-
-//   // IngrainedQuest Routes For User EndPoint
-//   app.route('/users')
-//     .get(ingrainedQuestUsers.listUsers);
-  
-//     // app.route('/users/:userId')
-//     // .get(ingrainedQuestUsers.getUser);
-// }
-
-
 var express = require('express');
 var router = express.Router();
 var IQUserController = require('../controllers/ingrainedQuestUsersController');
 
 // GET request for creating User. NOTE This must come before route for id (i.e. display User).
-router.get('/User/create', IQUserController.user_create_get);
+router.get('/User/create', IQUserController.userCreateGet);
 
 // POST request for creating User.
-router.post('/User/create', IQUserController.user_create_post);
+router.post('/User/create', IQUserController.userCreatePost);
 
 // GET request to delete User.
-router.get('/User/:id/delete', IQUserController.user_delete_get);
+router.get('/User/:id/delete', IQUserController.userDeleteGet);
 
 // POST request to delete User.
-router.post('/User/:id/delete', IQUserController.user_delete_post);
+router.post('/User/:id/delete', IQUserController.userDeletePost);
 
 // GET request to update User.
-router.get('/User/:id/update', IQUserController.user_update_get);
+router.get('/User/:id/update', IQUserController.userUpdateGet);
 
 // POST request to update User.
-router.post('/User/:id/update', IQUserController.user_update_post);
+router.post('/User/:id/update', IQUserController.userUpdatePost);
 
 // GET request for one User.
-router.get('/User/:id', IQUserController.user_detail);
+router.get('/User/:id', IQUserController.userDetail);
 
 // GET request for list of all Users.
-router.get('/Users', IQUserController.user_list);
+router.get('/Users', IQUserController.userList);
 
 // GET request for User Controller Home.
-router.get('/', IQUserController.user_list);
+router.get('/', IQUserController.userList);
 
 module.exports = router;
 

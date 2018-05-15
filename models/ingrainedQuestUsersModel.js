@@ -78,7 +78,35 @@ module.exports.getUser = function (uid) {
     });
   })
 }
-
+/*
+  Deletes a user's data from the database.
+*/
+module.exports.deleteUser = function (uid) {
+  return new Promise((resolve, reject) => {
+    mainModel.deleteRecord(uid,'Users').then((response, error) =>{
+      if(!error){
+        resolve(response);
+      } else {
+        reject(error);
+      }
+    });
+  })
+}
+/*
+  Creates a single user's data in the database.
+*/
+module.exports.createUser = function (userData) {
+  return new Promise((resolve, reject) => {
+    const sqlQuery = 'SELECT public.function_insertUserRecord("'+ userData.firstname +'")';
+    mainModel.createRecord(sqlQuery).then((response, error) =>{
+      if(!error){
+        resolve(response);
+      } else {
+        reject(error);
+      }
+    });
+  })
+}
 /*
   Delete a user's data from the database.
 */
