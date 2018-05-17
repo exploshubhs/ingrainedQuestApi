@@ -31,14 +31,13 @@ exports.userDetail = function(req, res) {
 exports.userCreateGet = function(req, res) {
    // res.send('NOT IMPLEMENTED: User create GET');
    // creating JSon data
-   const userData = {firstname: 'Tejas'};
+   const userData = {firstname: 'Tejas', lastname: 'Sonpal', username: 'tejas.sonp@gmail.com'};
    ingrainedQuestUsers.createUser(userData).then((response, error) =>{
     if(!error){
         debugger;
-        var jsonData = JSON.stringify(response.rows);
-        res.send('Getting the Information About A User '+ jsonData);
+        res.send('Inserted '+ response.rowCount + ' user/users in the database ');
     } else {
-        res.send('Error Occured In Getting the User Information From The Database');
+        res.send('Error Occured In Inserting the User Information In The Database');
     }
 });
 };

@@ -213,10 +213,9 @@ module.exports.createRecord = function (insertQuery) {
       console.log('connected ', connectError);
       pgClient.query(insertQuery, function( queryError, result ) {
         console.log('queried',queryError);
-        if (result !== null) {
-          
+        if (result !== null && result!= undefined) {
           try {
-              console.log('queried rows',result.rows);
+              console.log('queried rows',result);
               resolve(result);
           } catch (error) {
               console.log('model.getUsers', error.message);
@@ -224,7 +223,7 @@ module.exports.createRecord = function (insertQuery) {
           } finally {
            // pgClient.close();
           }  
-          console.log('results :'+result.rows);
+          console.log('results :'+result);
           resolve('NoResults');
         }
       });
