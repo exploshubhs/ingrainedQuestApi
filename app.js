@@ -6,6 +6,7 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var IQ_userRouter = require('./routes/ingrainedQuestUsersRoute');
+var IQ_invoiceRouter = require('./routes/ingrainedQuestInvoiceRoute');
 
 //Swagger Requirement
 var swaggerJSDoc = require('swagger-jsdoc');
@@ -51,6 +52,7 @@ app.use('/', indexRouter);
 
 //code for IngrainedQuest routes
 app.use('/ingrainedQuestUsers', IQ_userRouter);
+app.use('/ingrainedQuestInvoices', IQ_invoiceRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
